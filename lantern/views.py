@@ -5,6 +5,9 @@ from rest_framework.response import Response
 
 from uuid import uuid4
 
+import pandas as pd
+import random
+
 from .models import *
 from .serializers import LanternSerializer
 from .paginations import LanternPagination
@@ -13,6 +16,7 @@ from .filters import LanternFilter
 from django.db.models import Count, Q
 from django.contrib.auth.hashers import check_password
 from django_filters import rest_framework as filters
+
 
 class LanternViewSet(
     mixins.CreateModelMixin,
@@ -32,6 +36,18 @@ class LanternViewSet(
 
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = LanternFilter
+
+    def get_random_fortune(self):
+        df = pd.read_excel('static/fortune.xlsx')  
+        fortunes = df['fortune'].tolist()  # 'fortune'은 컬럼명임!
+        return random.choice(fortunes)
+
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs) 
+        random_fortune = self.get_random_fortune()
+        response.data['fortune'] = random_fortune 
+        return response
 
     #좋아요 누를 시 쿠키 기반으로 막기
     @action(methods=["POST"], detail=True, permission_classes=[AllowAny])
