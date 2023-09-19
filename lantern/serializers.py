@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework.serializers import ListField
 
+from django.contrib.auth.hashers import make_password
+
 from .models import Lantern
 
 
@@ -12,6 +14,7 @@ class LanternSerializer(serializers.ModelSerializer):
         return instance.reactions.filter(reaction='like').count()
 
     def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data['password'])
         lantern = Lantern.objects.create(**validated_data)
         return lantern
 
@@ -22,6 +25,10 @@ class LanternSerializer(serializers.ModelSerializer):
             'nickname',
             'content',
             'created_at',
-            'like_cnt'
+            'like_cnt',
+            'password'
         ]
         read_only_fields = ['id', 'created_at', 'like_cnt']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
