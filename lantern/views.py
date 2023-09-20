@@ -1,14 +1,22 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
 from uuid import uuid4
+
+import pandas as pd
+import random
 
 from .models import *
 from .serializers import LanternSerializer
+from .paginations import LanternPagination
+from .filters import LanternFilter
 
 from django.db.models import Count, Q
 from django.contrib.auth.hashers import check_password
+from django_filters import rest_framework as filters
+
 
 class LanternViewSet(
     mixins.CreateModelMixin,
@@ -24,6 +32,24 @@ class LanternViewSet(
 
     serializer_class = LanternSerializer
 
+    pagination_class = LanternPagination
+
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = LanternFilter
+
+    def get_random_fortune(self):
+        df = pd.read_excel('static/fortune.xlsx')  
+        fortunes = df['fortune'].tolist()  # 'fortune'은 컬럼명임!
+        return random.choice(fortunes)
+
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs) 
+        random_fortune = self.get_random_fortune()
+        response.data['fortune'] = random_fortune 
+        return response
+
+    #좋아요 누를 시 쿠키 기반으로 막기
     @action(methods=["POST"], detail=True, permission_classes=[AllowAny])
     def likes(self, request, pk=None):
         lantern = self.get_object()
@@ -49,6 +75,7 @@ class LanternViewSet(
 
         return response
 
+    #글 삭제 시 비밀번호 입력
     @action(methods=['POST'], detail=True, permission_classes=[AllowAny])
     def delete(self, request, pk=None):
         lantern = self.get_object()
@@ -64,3 +91,19 @@ class LanternViewSet(
             return Response({'detail': '글이 성공적으로 삭제되었습니다.'}, status=204)
         else:
             return Response({'detail': '비밀번호가 틀렸습니다.'}, status=400)
+
+    #최신순 정렬
+    @action(detail=False, methods=["GET"])
+    def recent(self, request):
+        lanterns = self.filter_queryset(self.queryset.order_by("-created_at"))
+        page = self.paginate_queryset(lanterns)  
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)  
+
+    #응원순 정렬, 전부 like 0개면 걍 최신순으로 뜨게 함(라이크 수 같아도)
+    @action(detail=False, methods=["GET"])
+    def pop(self, request):
+        lanterns = self.filter_queryset(self.queryset.order_by("-like_cnt"))
+        page = self.paginate_queryset(lanterns)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
