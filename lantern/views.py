@@ -1,4 +1,4 @@
-from rest_framework import viewsets, mixins, filters
+from rest_framework import viewsets, mixins, filters, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -7,16 +7,22 @@ from uuid import uuid4
 
 import pandas as pd
 import random
+import os
 
 from .models import *
-from .serializers import LanternSerializer
+from .serializers import LanternSerializer, ReportSerializer
 from .paginations import LanternPagination
 from .filters import LanternFilter
 
 from django.db.models import Count, Q
 from django.contrib.auth.hashers import check_password
 from django_filters import rest_framework as filters
-
+from django.contrib.staticfiles import finders
+from django.conf import settings
+from django.http import BadHeaderError
+from django.shortcuts import get_object_or_404
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 class LanternViewSet(
     mixins.CreateModelMixin,
@@ -37,17 +43,32 @@ class LanternViewSet(
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = LanternFilter
 
-    def get_random_fortune(self):
-        df = pd.read_excel('static/fortune.xlsx')  
-        fortunes = df['fortune'].tolist()  # 'fortune'은 컬럼명임!
-        return random.choice(fortunes)
-
-
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs) 
-        random_fortune = self.get_random_fortune()
-        response.data['fortune'] = random_fortune 
         return response
+
+    def get_random_fortune_from_excel(self):
+        file_path = os.path.join(settings.BASE_DIR, 'static', 'fortune.xlsx')
+        df = pd.read_excel(file_path)
+        fortune = random.choice(df['fortune'].tolist())
+        return fortune
+
+    @receiver(post_save, sender=LanternReaction)
+    def update_likes_count(sender, instance, created, **kwargs):
+        if created:
+            if instance.reaction == "like":
+                instance.lantern.like_cnt += 1
+                if instance.lantern.like_cnt >= 10:
+                    instance.lantern.light_bool = True
+                instance.lantern.save()
+
+    @receiver(post_delete, sender=LanternReaction)
+    def decrement_likes_count(sender, instance, **kwargs):
+        if instance.reaction == "like":
+            instance.lantern.like_cnt -= 1
+            if instance.lantern.like_cnt < 10:
+                instance.lantern.light_bool = False
+            instance.lantern.save()
 
     #좋아요 누를 시 쿠키 기반으로 막기
     @action(methods=["POST"], detail=True, permission_classes=[AllowAny])
@@ -107,3 +128,47 @@ class LanternViewSet(
         page = self.paginate_queryset(lanterns)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
+    def cookie(self, request):
+        user_id = request.COOKIES.get('user_id')
+        if not user_id:
+            user_id = str(uuid4())  # 새로운 user_id 생성
+            new_cookie = True
+        else:
+            new_cookie = False
+
+        fortune = Fortune.objects.filter(user_id=user_id).first()
+
+        # 이미 해당 사용자에게 할당된 fortune이 있다면 반환
+        if fortune:
+            response = Response({"fortune": fortune.fortune})
+        else:
+            # 아니라면 새 fortune 할당
+            fortune = self.get_random_fortune_from_excel()
+            Fortune.objects.create(user_id=user_id, fortune=fortune)
+            response = Response({"fortune": fortune})
+
+        if new_cookie:
+            response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # 유효기간 1년으로 해뒀는디 바꿔도 됨
+
+        return response
+
+    @action(detail=True, methods=["POST"], url_path='report')
+    def report(self, request, pk=None):
+        lantern = self.get_object()
+        
+        existing_cookie_key = request.COOKIES.get(str(lantern.id))
+        if existing_cookie_key:
+            return Response({'detail': '이미 신고한 게시글입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        report_key = get_random_string(length=10)
+        report = Report.objects.create(lantern=lantern, key=report_key)
+
+        serializer = ReportSerializer(report)
+        data = serializer.data
+
+        response = Response(data, status=status.HTTP_201_CREATED)
+        response.set_cookie(str(lantern.id), report_key, max_age=365*24*60*60)  # 1년 동안 유효
+
+        return response
