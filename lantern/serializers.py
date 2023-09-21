@@ -3,8 +3,7 @@ from rest_framework.serializers import ListField
 
 from django.contrib.auth.hashers import make_password
 
-from .models import Lantern
-
+from .models import *
 
 class LanternSerializer(serializers.ModelSerializer):
     nickname = serializers.CharField()
@@ -26,9 +25,24 @@ class LanternSerializer(serializers.ModelSerializer):
             'content',
             'created_at',
             'like_cnt',
-            'password'
+            'password',
+            'light_bool',
         ]
-        read_only_fields = ['id', 'created_at', 'like_cnt']
+        read_only_fields = ['id', 'created_at', 'like_cnt', 'light_bool']
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
+class ReportCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportCategory
+        fields = ('name',)
+
+class ReportSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField()
+    lantern = serializers.IntegerField(source='lantern.id')
+    key = serializers.CharField()
+
+    class Meta:
+        model = Report
+        fields = ('id', 'created_at', 'lantern', 'key')
