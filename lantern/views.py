@@ -15,7 +15,7 @@ from .paginations import LanternPagination
 from .filters import LanternFilter
 
 from django.db.models import Count, Q
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from django_filters import rest_framework as filters
 from django.contrib.staticfiles import finders
 from django.conf import settings
@@ -44,8 +44,26 @@ class LanternViewSet(
     filterset_class = LanternFilter
 
     def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs) 
-        return response
+        # 닉네임에 공백이 포함되어 있는지 검사
+        nickname = request.data.get('nickname', '').strip()
+        if ' ' in nickname:
+            return Response({"detail": "공백없이 닉네임을 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 비밀번호를 해시하여 저장
+        password = request.data.get('password')
+        hashed_password = make_password(password)
+
+        # request.data의 복사본을 생성
+        data = request.data.copy()
+        data['password'] = hashed_password
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
     def get_random_fortune_from_excel(self):
         file_path = os.path.join(settings.BASE_DIR, 'static', 'fortune.xlsx')
