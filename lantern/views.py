@@ -87,7 +87,6 @@ class LanternViewSet(
                 instance.lantern.light_bool = False
                 instance.lantern.save()
 
-
     #좋아요 누를 시 쿠키 기반으로 막기
     @action(methods=["POST"], detail=True, permission_classes=[AllowAny])
     def likes(self, request, pk=None):
