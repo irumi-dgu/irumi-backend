@@ -73,20 +73,20 @@ class LanternViewSet(
 
     @receiver(post_save, sender=LanternReaction)
     def update_likes_count(sender, instance, created, **kwargs):
-        if created:
-            if instance.reaction == "like":
-                instance.lantern.like_cnt += 1
-                if instance.lantern.like_cnt >= 10:
-                    instance.lantern.light_bool = True
+        if created and instance.reaction == "like":
+            total_likes = LanternReaction.objects.filter(lantern=instance.lantern, reaction="like").count()
+            if total_likes >= 10:
+                instance.lantern.light_bool = True
                 instance.lantern.save()
 
     @receiver(post_delete, sender=LanternReaction)
     def decrement_likes_count(sender, instance, **kwargs):
         if instance.reaction == "like":
-            instance.lantern.like_cnt -= 1
-            if instance.lantern.like_cnt < 10:
+            total_likes = LanternReaction.objects.filter(lantern=instance.lantern, reaction="like").count()
+            if total_likes < 10:
                 instance.lantern.light_bool = False
-            instance.lantern.save()
+                instance.lantern.save()
+
 
     #좋아요 누를 시 쿠키 기반으로 막기
     @action(methods=["POST"], detail=True, permission_classes=[AllowAny])
