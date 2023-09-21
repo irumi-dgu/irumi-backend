@@ -1,10 +1,10 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from rest_framework import routers
 from .views import LanternViewSet
 
-router = DefaultRouter(trailing_slash=False)
-router.register(r'lanterns', LanternViewSet)
+default_router = routers.SimpleRouter(trailing_slash=False)
+default_router.register("lanterns", LanternViewSet, basename="lanterns")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', include(default_router.urls)),
 ]
