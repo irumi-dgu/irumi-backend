@@ -15,7 +15,7 @@ from .paginations import LanternPagination
 from .filters import LanternFilter
 
 from django.db.models import Count, Q
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from django_filters import rest_framework as filters
 from django.contrib.staticfiles import finders
 from django.conf import settings
@@ -43,9 +43,31 @@ class LanternViewSet(
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = LanternFilter
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['user_id'] = self.request.COOKIES.get('user_id', None)
+        return context
+
     def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs) 
-        return response
+        # 닉네임에 공백이 포함되어 있는지 검사
+        nickname = request.data.get('nickname', '').strip()
+        if ' ' in nickname:
+            return Response({"detail": "공백없이 닉네임을 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 비밀번호를 해시하여 저장
+        password = request.data.get('password')
+        hashed_password = make_password(password)
+
+        # request.data의 복사본을 생성
+        data = request.data.copy()
+        data['password'] = hashed_password
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_random_fortune_from_excel(self):
         file_path = os.path.join(settings.BASE_DIR, 'static', 'fortune.xlsx')
@@ -55,20 +77,19 @@ class LanternViewSet(
 
     @receiver(post_save, sender=LanternReaction)
     def update_likes_count(sender, instance, created, **kwargs):
-        if created:
-            if instance.reaction == "like":
-                instance.lantern.like_cnt += 1
-                if instance.lantern.like_cnt >= 10:
-                    instance.lantern.light_bool = True
+        if created and instance.reaction == "like":
+            total_likes = LanternReaction.objects.filter(lantern=instance.lantern, reaction="like").count()
+            if total_likes >= 10:
+                instance.lantern.light_bool = True
                 instance.lantern.save()
 
     @receiver(post_delete, sender=LanternReaction)
     def decrement_likes_count(sender, instance, **kwargs):
         if instance.reaction == "like":
-            instance.lantern.like_cnt -= 1
-            if instance.lantern.like_cnt < 10:
+            total_likes = LanternReaction.objects.filter(lantern=instance.lantern, reaction="like").count()
+            if total_likes < 10:
                 instance.lantern.light_bool = False
-            instance.lantern.save()
+                instance.lantern.save()
 
     #좋아요 누를 시 쿠키 기반으로 막기
     @action(methods=["POST"], detail=True, permission_classes=[AllowAny])
