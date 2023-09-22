@@ -8,6 +8,8 @@ from .models import *
 class LanternSerializer(serializers.ModelSerializer):
     nickname = serializers.CharField()
     like_cnt = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+    is_reported = serializers.SerializerMethodField()
 
     def get_like_cnt(self, instance):
         return instance.reactions.filter(reaction='like').count()
@@ -16,6 +18,19 @@ class LanternSerializer(serializers.ModelSerializer):
         validated_data['password'] = make_password(validated_data['password'])
         lantern = Lantern.objects.create(**validated_data)
         return lantern
+
+    def get_is_liked(self, obj):
+        user_id = self.context.get('user_id')
+        if not user_id:
+            return False
+        return LanternReaction.objects.filter(lantern=obj, user_id=user_id, reaction="like").exists()
+
+    def get_is_reported(self, obj):
+        user_id = self.context.get('user_id')
+        if not user_id:
+            return False
+        return Report.objects.filter(lantern=obj, key=user_id).exists()
+
 
     class Meta:
         model = Lantern
@@ -27,8 +42,10 @@ class LanternSerializer(serializers.ModelSerializer):
             'like_cnt',
             'password',
             'light_bool',
+            'is_liked',
+            'is_reported',
         ]
-        read_only_fields = ['id', 'created_at', 'like_cnt', 'light_bool']
+        read_only_fields = ['id', 'created_at', 'like_cnt', 'light_bool', 'is_liked', 'is_reported']
         extra_kwargs = {
             'password': {'write_only': True}
         }
