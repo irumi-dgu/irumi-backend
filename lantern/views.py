@@ -43,6 +43,11 @@ class LanternViewSet(
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = LanternFilter
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['user_id'] = self.request.COOKIES.get('user_id', None)
+        return context
+
     def create(self, request, *args, **kwargs):
         # 닉네임에 공백이 포함되어 있는지 검사
         nickname = request.data.get('nickname', '').strip()
@@ -63,7 +68,6 @@ class LanternViewSet(
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
 
     def get_random_fortune_from_excel(self):
         file_path = os.path.join(settings.BASE_DIR, 'static', 'fortune.xlsx')

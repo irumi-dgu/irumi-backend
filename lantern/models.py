@@ -19,6 +19,8 @@ class Lantern(models.Model):
         help_text="네 자리 숫자를 입력해주세요."
     )
     light_bool = models.BooleanField(default=False)
+    is_liked = models.BooleanField(default=False)
+    is_reported = models.BooleanField(default=False)
 
 class LanternReaction(models.Model):
     REACTION_CHOICES = (("like", "Like"), ("dislike", "Dislike"))
