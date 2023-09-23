@@ -5,7 +5,41 @@ from django.contrib.auth.hashers import make_password
 
 from .models import *
 
-class LanternSerializer(serializers.ModelSerializer):
+# 랜턴 리스트만 보여주는 시리얼라이저
+class LanternListSerializer(serializers.ModelSerializer):
+    like_cnt = serializers.SerializerMethodField()
+    light_bool = serializers.BooleanField()
+
+    def get_like_cnt(self, instance):
+        return instance.reactions.filter(reaction='like').count()
+
+    def get_light_bool(self, instance):
+        if instance.like_cnt >= 10:
+            return True
+        return False
+    
+    def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data['password'])
+        lantern = Lantern.objects.create(**validated_data)
+        return lantern
+    
+    class Meta:
+        model = Lantern
+        fields = [
+            'id', 
+            'nickname', 
+            'content', 
+            'password',
+            'like_cnt', 
+            'light_bool',
+            'lantern_color',
+        ]
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+
+class LanternDetailSerializer(serializers.ModelSerializer):
     nickname = serializers.CharField()
     like_cnt = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
@@ -13,11 +47,6 @@ class LanternSerializer(serializers.ModelSerializer):
 
     def get_like_cnt(self, instance):
         return instance.reactions.filter(reaction='like').count()
-
-    def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data['password'])
-        lantern = Lantern.objects.create(**validated_data)
-        return lantern
 
     def get_is_liked(self, obj):
         user_id = self.context.get('user_id')
@@ -31,7 +60,6 @@ class LanternSerializer(serializers.ModelSerializer):
             return False
         return Report.objects.filter(lantern=obj, key=user_id).exists()
 
-
     class Meta:
         model = Lantern
         fields = [
@@ -44,6 +72,7 @@ class LanternSerializer(serializers.ModelSerializer):
             'light_bool',
             'is_liked',
             'is_reported',
+            'lantern_color',
         ]
         read_only_fields = ['id', 'created_at', 'like_cnt', 'light_bool', 'is_liked', 'is_reported']
         extra_kwargs = {
