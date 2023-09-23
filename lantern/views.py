@@ -10,7 +10,7 @@ import random
 import os
 
 from .models import *
-from .serializers import LanternSerializer, ReportSerializer
+from .serializers import *
 from .paginations import LanternPagination
 from .filters import LanternFilter
 
@@ -36,12 +36,19 @@ class LanternViewSet(
         )
     ).order_by('-created_at') 
 
-    serializer_class = LanternSerializer
-
+    serializer_class = LanternListSerializer
+    detail_serializer_class = LanternDetailSerializer
     pagination_class = LanternPagination
-
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = LanternFilter
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            if hasattr(self, 'detail_serializer_class'):
+                print("현재 detail serializer를 사용중")
+                return self.detail_serializer_class
+        print("현재 list serializer를 사용중")
+        return super().get_serializer_class()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
