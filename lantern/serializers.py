@@ -33,7 +33,7 @@ class LanternListSerializer(serializers.ModelSerializer):
             'password',
             'like_cnt', 
             'light_bool',
-            'lantern_color',
+            'lanternColor',
         ]
         extra_kwargs = {
             'password': {'write_only': True}
@@ -80,7 +80,7 @@ class LanternDetailSerializer(serializers.ModelSerializer):
             'light_bool',
             'is_liked',
             'is_reported',
-            'lantern_color',
+            'lanternColor',
         ]
         read_only_fields = ['id', 'created_at', 'like_cnt', 'light_bool', 'is_liked', 'is_reported']
         extra_kwargs = {
