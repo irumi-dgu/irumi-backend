@@ -10,14 +10,14 @@ class Lantern(models.Model):
         max_length=10,
         null=False,
         blank=False,
-        validators=[RegexValidator(r'^[^\s]{1,10}$', "공백없이 닉네임을 입력해주세요.")],
-        help_text="공백없이 닉네임을 입력해주세요."
+        #validators=[RegexValidator(r'^[^\s]{1,10}$', "공백없이 닉네임을 입력해주세요.")],
+        #help_text="공백없이 닉네임을 입력해주세요."
     )
     content = models.TextField(max_length=100, null=False, blank=False)
     password = models.CharField(
         max_length=4, 
-        validators=[RegexValidator(r'^\d{4}$', "네 자리 숫자를 입력해주세요.")], 
-        help_text="네 자리 숫자를 입력해주세요."
+        #validators=[RegexValidator(r'^\d{4}$', "네 자리 숫자를 입력해주세요.")], 
+        #help_text="네 자리 숫자를 입력해주세요."
     )
     light_bool = models.BooleanField(blank=True, default=False)
     is_liked = models.BooleanField(default=False)
