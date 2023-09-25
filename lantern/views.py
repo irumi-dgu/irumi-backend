@@ -161,6 +161,7 @@ class LanternViewSet(
             return Response({'detail': '비밀번호를 입력해주세요.'}, status=400)
 
         # db 비밀번호랑 일치 여부 확인
+        # Ensure that the provided password is checked in the same manner it was hashed.
         if check_password(password_provided, lantern.password):
             lantern.delete()
             return Response({'detail': '글이 성공적으로 삭제되었습니다.'}, status=204)
@@ -183,25 +184,28 @@ class LanternViewSet(
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
-    @action(detail=True, methods=["POST"], url_path='report')
+    @action(detail=True, methods=["POST"])
     def report(self, request, pk=None):
         lantern = self.get_object()
-        
-        existing_cookie_uuid = request.COOKIES.get(str(lantern.id))
-        if existing_cookie_uuid:
+        user_id = request.COOKIES.get('user_id', str(uuid4()))
+
+        existing_report = Report.objects.filter(lantern=lantern, user_id=user_id).first()
+        if existing_report:
             return Response({'detail': '이미 신고한 게시글입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        report_uuid = str(uuid4())
-        report = Report.objects.create(lantern=lantern)
+        report = Report.objects.create(lantern=lantern, user_id=user_id)
+
+        # Get the ID of the report
+        report_id = report.id
 
         serializer = ReportSerializer(report)
         data = serializer.data
 
         response = Response(data, status=status.HTTP_201_CREATED)
-        response.set_cookie(str(lantern.id), report_uuid, max_age=365*24*60*60)  # 1년 동안 유효
+        # Set the more distinct cookie name with the report ID
+        response.set_cookie('report_id_for_' + user_id, report_id, max_age=365*24*60*60)  # 1년 동안 유효
 
         return response
-
 
     @action(detail=False, methods=["GET"], url_path='random')
     def random(self, request):
