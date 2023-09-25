@@ -54,4 +54,4 @@ class Report(models.Model):
     lantern = models.ForeignKey(Lantern, on_delete=models.CASCADE)
     categories = models.ManyToManyField(ReportCategory)
     created_at = models.DateTimeField(auto_now_add=True)
-    key = models.CharField(max_length=10, default=get_random_string(length=10))
+    #key = models.CharField(max_length=10, default=get_random_string(length=10))
