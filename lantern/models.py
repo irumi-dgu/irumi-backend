@@ -19,7 +19,7 @@ class Lantern(models.Model):
         validators=[RegexValidator(r'^\d{4}$', "네 자리 숫자를 입력해주세요.")], 
         help_text="네 자리 숫자를 입력해주세요."
     )
-    light_bool = models.BooleanField(default=False)
+    light_bool = models.BooleanField(blank=True, default=False)
     is_liked = models.BooleanField(default=False)
     is_reported = models.BooleanField(default=False)
     COLOR_CHOICES = [

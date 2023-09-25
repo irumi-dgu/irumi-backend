@@ -200,3 +200,15 @@ class LanternViewSet(
         response.set_cookie(str(lantern.id), report_key, max_age=365*24*60*60)  # 1년 동안 유효
 
         return response
+    
+    @action(detail=False, methods=["GET"], url_path='random')
+    def rand(self, request):
+        queryset = self.get_queryset()
+        totCount = queryset.count()
+        lanterns = queryset.order_by("?")[:20]
+        serializer = self.get_serializer(lanterns, many=True)
+        
+        return Response({
+            'totCount': totCount,
+            'lanterns': serializer.data
+        })
