@@ -42,6 +42,31 @@ class LanternViewSet(
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = LanternFilter
 
+    @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
+    def cookie(self, request):
+        user_id = request.COOKIES.get('user_id')
+        if not user_id:
+            user_id = str(uuid4())  # 새로운 user_id 생성
+            new_cookie = True
+        else:
+            new_cookie = False
+
+        fortune = Fortune.objects.filter(user_id=user_id).first()
+
+        # 이미 해당 사용자에게 할당된 fortune이 있다면 반환
+        if fortune:
+            response = Response({"fortune": fortune.fortune})
+        else:
+            # 아니라면 새 fortune 할당
+            fortune = self.get_random_fortune_from_excel()
+            Fortune.objects.create(user_id=user_id, fortune=fortune)
+            response = Response({"fortune": fortune})
+
+        if new_cookie:
+            response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # 유효기간 1년으로 해뒀는디 바꿔도 됨
+
+        return response
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             if hasattr(self, 'detail_serializer_class'):
@@ -158,52 +183,28 @@ class LanternViewSet(
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
-    @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
-    def cookie(self, request):
-        user_id = request.COOKIES.get('user_id')
-        if not user_id:
-            user_id = str(uuid4())  # 새로운 user_id 생성
-            new_cookie = True
-        else:
-            new_cookie = False
-
-        fortune = Fortune.objects.filter(user_id=user_id).first()
-
-        # 이미 해당 사용자에게 할당된 fortune이 있다면 반환
-        if fortune:
-            response = Response({"fortune": fortune.fortune})
-        else:
-            # 아니라면 새 fortune 할당
-            fortune = self.get_random_fortune_from_excel()
-            Fortune.objects.create(user_id=user_id, fortune=fortune)
-            response = Response({"fortune": fortune})
-
-        if new_cookie:
-            response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # 유효기간 1년으로 해뒀는디 바꿔도 됨
-
-        return response
-
     @action(detail=True, methods=["POST"], url_path='report')
     def report(self, request, pk=None):
         lantern = self.get_object()
         
-        existing_cookie_key = request.COOKIES.get(str(lantern.id))
-        if existing_cookie_key:
+        existing_cookie_uuid = request.COOKIES.get(str(lantern.id))
+        if existing_cookie_uuid:
             return Response({'detail': '이미 신고한 게시글입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        report_key = get_random_string(length=10)
-        report = Report.objects.create(lantern=lantern, key=report_key)
+        report_uuid = str(uuid4())
+        report = Report.objects.create(lantern=lantern)
 
         serializer = ReportSerializer(report)
         data = serializer.data
 
         response = Response(data, status=status.HTTP_201_CREATED)
-        response.set_cookie(str(lantern.id), report_key, max_age=365*24*60*60)  # 1년 동안 유효
+        response.set_cookie(str(lantern.id), report_uuid, max_age=365*24*60*60)  # 1년 동안 유효
 
         return response
-    
+
+
     @action(detail=False, methods=["GET"], url_path='random')
-    def rand(self, request):
+    def random(self, request):
         queryset = self.get_queryset()
         totCount = queryset.count()
         lanterns = queryset.order_by("?")[:20]
