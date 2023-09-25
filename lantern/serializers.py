@@ -14,6 +14,7 @@ class LanternListSerializer(serializers.ModelSerializer):
         return instance.reactions.filter(reaction='like').count()
 
     def get_light_bool(self, instance):
+        like_count = self.get_like_cnt(instance)
         if instance.like_cnt >= 10:
             return True
         return False
@@ -62,6 +63,7 @@ class LanternDetailSerializer(serializers.ModelSerializer):
         return Report.objects.filter(lantern=obj, user_id=user_id).exists()
 
     def get_light_bool(self, instance):
+        like_count = self.get_like_cnt(instance)
         if instance.like_cnt >= 10:
             return True
         return False
