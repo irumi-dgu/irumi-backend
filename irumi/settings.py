@@ -28,7 +28,12 @@ SECRET_KEY = "django-insecure-fw-1_fxow)%5shvc3ta!+o4xaht_sxiq4zd*gikairq9bgw6!$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "www.iirumi.com",
+]
+
 
 
 # Application definition
@@ -146,4 +151,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:5173",
     "http://localhost:5173",
+    "https://www.iirumi.com",
+    "http://www.iirumi.com",
 ]
