@@ -58,7 +58,7 @@ class LanternDetailSerializer(serializers.ModelSerializer):
         user_id = self.context.get('user_id')
         if not user_id:
             return False
-        return Report.objects.filter(lantern=obj, key=user_id).exists()
+        return Report.objects.filter(lantern=obj, user_id=user_id).exists()
 
     class Meta:
         model = Lantern
@@ -87,8 +87,8 @@ class ReportCategorySerializer(serializers.ModelSerializer):
 class ReportSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField()
     lantern = serializers.IntegerField(source='lantern.id')
-    key = serializers.CharField()
+    user_id = serializers.CharField()
 
     class Meta:
         model = Report
-        fields = ('id', 'created_at', 'lantern', 'key')
+        fields = ('id', 'created_at', 'lantern', 'user_id')
