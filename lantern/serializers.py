@@ -8,7 +8,7 @@ from .models import *
 # 랜턴 리스트만 보여주는 시리얼라이저
 class LanternListSerializer(serializers.ModelSerializer):
     like_cnt = serializers.SerializerMethodField()
-    light_bool = serializers.BooleanField()
+    light_bool = serializers.SerializerMethodField()
 
     def get_like_cnt(self, instance):
         return instance.reactions.filter(reaction='like').count()
@@ -44,6 +44,7 @@ class LanternDetailSerializer(serializers.ModelSerializer):
     like_cnt = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     is_reported = serializers.SerializerMethodField()
+    light_bool = serializers.SerializerMethodField()
 
     def get_like_cnt(self, instance):
         return instance.reactions.filter(reaction='like').count()
@@ -56,10 +57,14 @@ class LanternDetailSerializer(serializers.ModelSerializer):
 
     def get_is_reported(self, obj):
         user_id = self.context.get('user_id')
-        print("User ID from context:", user_id)
         if not user_id:
             return False
         return Report.objects.filter(lantern=obj, user_id=user_id).exists()
+
+    def get_light_bool(self, instance):
+        if instance.like_cnt >= 10:
+            return True
+        return False
 
     class Meta:
         model = Lantern
