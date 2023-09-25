@@ -56,6 +56,7 @@ class LanternDetailSerializer(serializers.ModelSerializer):
 
     def get_is_reported(self, obj):
         user_id = self.context.get('user_id')
+        print("User ID from context:", user_id)
         if not user_id:
             return False
         return Report.objects.filter(lantern=obj, user_id=user_id).exists()
