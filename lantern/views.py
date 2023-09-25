@@ -70,9 +70,7 @@ class LanternViewSet(
     def get_serializer_class(self):
         if self.action == 'retrieve':
             if hasattr(self, 'detail_serializer_class'):
-                print("현재 detail serializer를 사용중")
                 return self.detail_serializer_class
-        print("현재 list serializer를 사용중")
         return super().get_serializer_class()
 
     def get_serializer_context(self):
