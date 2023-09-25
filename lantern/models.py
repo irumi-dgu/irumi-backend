@@ -29,7 +29,7 @@ class Lantern(models.Model):
         (4, '4'), # blue
         (5, '5'), # purple
     ]
-    lantern_color = models.IntegerField(choices=COLOR_CHOICES, default=1)
+    lanternColor = models.IntegerField(choices=COLOR_CHOICES, default=1)
 
 class LanternReaction(models.Model):
     REACTION_CHOICES = (("like", "Like"), ("dislike", "Dislike"))
