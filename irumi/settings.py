@@ -28,8 +28,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
+    "127.0.0.1:8000",
     "localhost",
     "www.iirumi.com",
+    "iirumi.com"
     "43.202.131.92",
     "43.202.131.92:5173",
 ]
