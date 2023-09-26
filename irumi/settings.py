@@ -156,5 +156,5 @@ CORS_ALLOWED_ORIGINS = [
     "https://iirumi.com",
     "http://iirumi.com",
     "http://43.202.131.92",
-    "http://43.202.131.92:5173/"
+    "http://43.202.131.92:5173"
 ]
