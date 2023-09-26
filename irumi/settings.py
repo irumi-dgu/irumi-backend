@@ -34,8 +34,8 @@ ALLOWED_HOSTS = [
     "www.iirumi.com",
     "iirumi.com"
     "15.165.100.180",
-    "15.165.100.180:5173"
-,
+    "15.165.100.180:5173",
+    "localhost:8000",
 ]
 
 #SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
