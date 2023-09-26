@@ -32,7 +32,7 @@ ALLOWED_HOSTS = [
     "http://127.0.0.1:5173",
     "localhost",
     "http://www.iirumi.com",
-    "http://iirumi.com"
+    "http://iirumi.com",
     "http://15.165.100.180",
     "http://15.165.100.180:5173",
     "http://localhost:8000",
