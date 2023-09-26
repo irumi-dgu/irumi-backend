@@ -28,14 +28,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
-    "127.0.0.1:8000",
-    "127.0.0.1:5173",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:5173",
     "localhost",
-    "www.iirumi.com",
-    "iirumi.com"
-    "15.165.100.180",
-    "15.165.100.180:5173",
-    "localhost:8000",
+    "http://www.iirumi.com",
+    "http://iirumi.com"
+    "http://15.165.100.180",
+    "http://15.165.100.180:5173",
+    "http://localhost:8000",
+    "http://localhost:5173",
+    "iirumi.com",
 ]
 
 #SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
