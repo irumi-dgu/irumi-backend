@@ -23,3 +23,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include('lantern.urls')),
 ]
+# 만약 DEBUG 모드인 경우 (개발 환경에서)
+if settings.DEBUG:
+    # 미디어 파일을 서빙하기 위한 URL 패턴을 추가
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# HTTPS로 전환하는 경우, 미디어 파일과 정적 파일을 서빙할 때도 HTTPS를 사용하려면 다음과 같이 설정해야 합니다.
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, secure=True)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT, secure=True)
