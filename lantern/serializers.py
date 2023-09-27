@@ -11,14 +11,14 @@ class LanternListSerializer(serializers.ModelSerializer):
     light_bool = serializers.SerializerMethodField()
 
     def get_like_cnt(self, instance):
-        return instance.reactions.filter(reaction='like').count()
+        return instance.like_cnt
 
     def get_light_bool(self, instance):
         like_count = self.get_like_cnt(instance)
-        if instance.like_cnt >= 10:
+        if like_count >= 10:
             return True
         return False
-    
+
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
         lantern = Lantern.objects.create(**validated_data)
@@ -48,7 +48,7 @@ class LanternDetailSerializer(serializers.ModelSerializer):
     light_bool = serializers.SerializerMethodField()
 
     def get_like_cnt(self, instance):
-        return instance.reactions.filter(reaction='like').count()
+        return instance.like_cnt
 
     def get_is_liked(self, obj):
         user_id = self.context.get('user_id')
@@ -64,7 +64,7 @@ class LanternDetailSerializer(serializers.ModelSerializer):
 
     def get_light_bool(self, instance):
         like_count = self.get_like_cnt(instance)
-        if instance.like_cnt>= 10:
+        if like_count >= 10:
             return True
         return False
         
