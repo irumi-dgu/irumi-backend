@@ -30,12 +30,6 @@ jobs:
       env:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
-    - name: Install AWS CLI
-      run: |
-        curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip awscliv2.zip
-        sudo ./aws/install
-
     - name: Deploy to AWS
       run: |
         aws s3 cp ./ s3://YOUR_S3_BUCKET_NAME/ --recursive
