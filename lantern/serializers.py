@@ -15,7 +15,7 @@ class LanternListSerializer(serializers.ModelSerializer):
 
     def get_light_bool(self, instance):
         like_count = self.get_like_cnt(instance)
-        if instance.like_cnt >= 10:
+        if like_count >= 10:
             return True
         return False
     
@@ -67,6 +67,13 @@ class LanternDetailSerializer(serializers.ModelSerializer):
         if like_count >= 10:
             return True
         return False
+
+        def get_light_bool(self, instance):
+    like_count = self.get_like_cnt(instance)
+    if like_count >= 10:  # 여기서 like_count를 사용합니다.
+        return True
+    return False
+
 
     class Meta:
         model = Lantern
