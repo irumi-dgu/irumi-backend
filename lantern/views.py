@@ -164,7 +164,7 @@ class LanternViewSet(
             lantern.delete()
             return Response({'detail': '글이 성공적으로 삭제되었습니다.'}, status=204)
         else:
-            return Response({'detail': '비밀번호가 틀렸습니다.'}, status=400)
+            return Response({'detail': '비밀번호가 틀렸습니다.'}, status=401)
 
     #최신순 정렬
     @action(detail=False, methods=["GET"])
