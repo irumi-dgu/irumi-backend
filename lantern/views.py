@@ -81,8 +81,6 @@ class LanternViewSet(
     def create(self, request, *args, **kwargs):
         # 닉네임에 공백이 포함되어 있는지 검사
         nickname = request.data.get('nickname')
-        #if ' ' in nickname:
-        #    return Response({"detail": "공백없이 닉네임을 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST)
 
         # 비밀번호를 해시하여 저장
         password = request.data.get('password')
