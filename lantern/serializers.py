@@ -11,7 +11,8 @@ class LanternListSerializer(serializers.ModelSerializer):
     light_bool = serializers.SerializerMethodField()
 
     def get_like_cnt(self, instance):
-        return instance.like_cnt
+        return instance.reactions.filter(reaction='like').count()
+
 
     def get_light_bool(self, instance):
         like_count = self.get_like_cnt(instance)
@@ -48,7 +49,8 @@ class LanternDetailSerializer(serializers.ModelSerializer):
     light_bool = serializers.SerializerMethodField()
 
     def get_like_cnt(self, instance):
-        return instance.like_cnt
+        return instance.reactions.filter(reaction='like').count()
+
 
     def get_is_liked(self, obj):
         user_id = self.context.get('user_id')
