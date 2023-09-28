@@ -48,7 +48,7 @@ jobs:
           git pull origin main
           source venv/bin/activate
           pip install -r requirements.txt
-          python irumi/manage.py migrate
+          manage.py migrate
 
       env:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
