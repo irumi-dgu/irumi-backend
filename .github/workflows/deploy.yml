@@ -8,9 +8,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    environment:
-      name: SECRET_KEY
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
