@@ -25,7 +25,6 @@ jobs:
 
     - name: Run tests
       run: |
-        cd irumi
         python manage.py test
 
   deploy:
