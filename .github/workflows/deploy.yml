@@ -39,10 +39,15 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
+        envs: SECRET_KEY
         script: |
           cd /path/to/your/project/on/ec2/irumi-backend
+          echo "SECRET_KEY=${SECRET_KEY}" > .env
           git pull origin main
           source venv/bin/activate
           pip install -r requirements.txt
           python irumi/manage.py migrate
-          # 다른 필요한 배포 명령어 추가
+
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
