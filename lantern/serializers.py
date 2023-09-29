@@ -13,7 +13,6 @@ class LanternListSerializer(serializers.ModelSerializer):
     def get_like_cnt(self, instance):
         return instance.reactions.filter(reaction='like').count()
 
-
     def get_light_bool(self, instance):
         like_count = self.get_like_cnt(instance)
         if like_count >= 10:
@@ -51,7 +50,6 @@ class LanternDetailSerializer(serializers.ModelSerializer):
     def get_like_cnt(self, instance):
         return instance.reactions.filter(reaction='like').count()
 
-
     def get_is_liked(self, obj):
         user_id = self.context.get('user_id')
         if not user_id:
@@ -69,7 +67,6 @@ class LanternDetailSerializer(serializers.ModelSerializer):
         if like_count >= 10:
             return True
         return False
-        
 
     class Meta:
         model = Lantern
@@ -90,16 +87,15 @@ class LanternDetailSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
 
-class ReportCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReportCategory
-        fields = ('name',)
-
 class ReportSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField()
-    lantern = serializers.IntegerField(source='lantern.id')
-    user_id = serializers.CharField()
+    created_at = serializers.DateTimeField(read_only=True)
+    lantern = serializers.IntegerField(source='lantern.id', read_only=True)
+    user_id = serializers.CharField(read_only=True)
+    category = serializers.ListField(
+        child=serializers.ChoiceField(choices=Report.CATEGORY_CHOICES),
+        allow_empty=False
+    )
 
     class Meta:
         model = Report
-        fields = ('id', 'created_at', 'lantern', 'user_id')
+        fields = ('id', 'created_at', 'lantern', 'user_id', 'category')

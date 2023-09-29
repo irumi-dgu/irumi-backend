@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.utils.crypto import get_random_string
+from multiselectfield import MultiSelectField
 
 class Lantern(models.Model):
 
@@ -40,18 +41,15 @@ class LanternReaction(models.Model):
 class Fortune(models.Model):
     user_id = models.CharField(max_length=36, unique=True)
     fortune = models.TextField()
-
-class ReportCategory(models.Model):
+    
+class Report(models.Model):
+    lantern = models.ForeignKey(Lantern, on_delete=models.CASCADE)
     CATEGORY_CHOICES = (
         ('abuse', '욕설 및 비하'),
         ('fraud', '개인정보 유출 및 사칭, 사기'),
         ('explicit', '음란물 또는 불건전한 대화'),
         ('promotion', '영리목적이나 홍보성 게시글'),
     )
-    name = models.CharField(choices=CATEGORY_CHOICES, max_length=50, unique=True)
-
-class Report(models.Model):
-    lantern = models.ForeignKey(Lantern, on_delete=models.CASCADE)
-    categories = models.ManyToManyField(ReportCategory)
+    category = MultiSelectField(choices=CATEGORY_CHOICES, max_choices=4, max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
     user_id = models.CharField(max_length=36, null=True)
