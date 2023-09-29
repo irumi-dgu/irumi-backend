@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     "lantern",
 
     "rest_framework",
-
+    "multiselectfield",
     "corsheaders",
 ]
 

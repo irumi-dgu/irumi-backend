@@ -180,28 +180,28 @@ class LanternViewSet(
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
-    @action(detail=True, methods=["POST"])
-    def report(self, request, pk=None):
-        lantern = self.get_object()
-        user_id = request.COOKIES.get('user_id', str(uuid4()))
+    # @action(detail=True, methods=["POST"])
+    # def report(self, request, pk=None):
+    #     lantern = self.get_object()
+    #     user_id = request.COOKIES.get('user_id', str(uuid4()))
 
-        existing_report = Report.objects.filter(lantern=lantern, user_id=user_id).first()
-        if existing_report:
-            return Response({'detail': '이미 신고한 게시글입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+    #     existing_report = Report.objects.filter(lantern=lantern, user_id=user_id).first()
+    #     if existing_report:
+    #         return Response({'detail': '이미 신고한 게시글입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        report = Report.objects.create(lantern=lantern, user_id=user_id)
+    #     report = Report.objects.create(lantern=lantern, user_id=user_id)
 
-        # Get the ID of the report
-        report_id = report.id
+    #     # Get the ID of the report
+    #     report_id = report.id
 
-        serializer = ReportSerializer(report)
-        data = serializer.data
+    #     serializer = ReportSerializer(report)
+    #     data = serializer.data
 
-        response = Response(data, status=status.HTTP_201_CREATED)
-        # Set the more distinct cookie name with the report ID
-        response.set_cookie('report_id_for_' + user_id, report_id, max_age=365*24*60*60)  # 1년 동안 유효
+    #     response = Response(data, status=status.HTTP_201_CREATED)
+    #     # Set the more distinct cookie name with the report ID
+    #     response.set_cookie('report_id_for_' + user_id, report_id, max_age=365*24*60*60)  # 1년 동안 유효
 
-        return response
+    #     return response
 
     @action(detail=False, methods=["GET"], url_path='random')
     def random(self, request):
@@ -214,3 +214,36 @@ class LanternViewSet(
             'totCount': totCount,
             'lanterns': serializer.data
         })
+
+class ReportViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
+    serializer_class = ReportSerializer
+    
+    def get_queryset(self, *args, **kwargs):
+        queryset = Report.objects.filter(
+                lantern__id=self.kwargs.get("id")
+            )
+        return queryset
+    
+    def create(self, request, *args, **kwargs):
+        user_id = request.COOKIES.get('user_id')
+        if not user_id:
+            user_id = str(uuid4())
+        
+        lantern_id = self.kwargs.get("id")
+        try:
+            lantern = Lantern.objects.get(id=lantern_id)
+        except Lantern.DoesNotExist:
+            return Response({'detail': '해당하는 게시글이 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        existing_report = Report.objects.filter(lantern=lantern, user_id=user_id).first()
+        if existing_report:
+            return Response({'detail': '이미 신고한 게시글입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user_id=user_id, lantern=lantern)
+        headers = self.get_success_headers(serializer.data)
+        
+        response = Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        response.set_cookie('user_id', user_id, max_age=365*24*60*60)
+        return response
