@@ -99,13 +99,3 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = ('id', 'created_at', 'lantern', 'user_id', 'category')
-
-    def to_internal_value(self, data):
-        if isinstance(data.get('category'), list):
-            data['category'] = ','.join(data['category'])
-        return super().to_internal_value(data)
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['category'] = representation['category'].split(',')
-        return representation
