@@ -24,6 +24,19 @@ from django.shortcuts import get_object_or_404
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
+def load_swears(file_name):
+    file_path = os.path.join(settings.BASE_DIR, 'static', file_name)
+    with open(file_path, 'r', encoding='utf-8') as file:
+        swears = file.read().splitlines()
+    return swears
+
+SWEARS = load_swears('fword_list.txt')
+
+def censor_content(content):
+    for swear in SWEARS:
+        content = content.replace(swear, '*' * len(swear))
+    return content
+
 class LanternViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -82,12 +95,17 @@ class LanternViewSet(
         # 닉네임에 공백이 포함되어 있는지 검사
         nickname = request.data.get('nickname')
 
+        #사용자가 작성한 내용 중 욕설 있는 지 필터링
+        content = request.data.get('content')
+        censored_content = censor_content(content)
+
         # 비밀번호를 해시하여 저장
         password = request.data.get('password')
         hashed_password = make_password(password)
 
         # request.data의 복사본을 생성
         data = request.data.copy()
+        data['content'] = censored_content
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
