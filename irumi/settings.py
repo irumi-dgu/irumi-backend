@@ -33,8 +33,8 @@ ALLOWED_HOSTS = [
     "localhost",
     "http://www.iirumi.com",
     "http://iirumi.com",
-    "http://15.165.100.180",
-    "http://15.165.100.180:5173",
+    "http://52.78.201.149",
+    "http://52.78.201.149:5173",
     "http://localhost:8000",
     "http://localhost:5173",
     "iirumi.com",
@@ -159,25 +159,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://iirumi.com",
     "http://iirumi.com",
-    "http://15.165.100.180:5173",
-    "http://15.165.100.180"
+    "http://52.78.201.149",
+    "http://52.78.201.149:5173"
 ]
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
