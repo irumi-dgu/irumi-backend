@@ -38,6 +38,8 @@ ALLOWED_HOSTS = [
     "http://localhost:8000",
     "http://localhost:5173",
     "iirumi.com",
+    "54.180.167.23",
+    "http://54.180.167.23",
 ]
 
 
@@ -161,4 +163,5 @@ CORS_ALLOWED_ORIGINS = [
     "http://iirumi.com",
     "http://52.78.201.149",
     "http://52.78.201.149:5173",
+    "http://54.180.167.23"
 ]
