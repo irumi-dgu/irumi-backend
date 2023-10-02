@@ -3,7 +3,7 @@ from .models import *
 
 class ReportAdmin(admin.ModelAdmin):
     list_display = ('id', 'lantern_content', 'reported_categories', 'user_id', 'created_at')
-    list_filter = ('created_at', 'category')
+    list_filter = ('created_at')
     search_fields = ('lantern__content', 'user_id')
     
     def lantern_content(self, obj):
