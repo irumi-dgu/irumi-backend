@@ -24,6 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 from decouple import config
 SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 DEBUG = True
 
 ALLOWED_HOSTS = [
@@ -173,7 +176,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://127.0.0.1:8000",
     "https://localhost:8000",
     "https://127.0.0.1:5173",
-    "https://localhost:5137",
+    "https://localhost:5173",
     "https://iirumi.com",
     "https://52.78.201.149",
     "https://52.78.201.149:5173",
