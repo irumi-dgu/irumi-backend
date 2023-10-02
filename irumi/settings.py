@@ -28,9 +28,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
+    "127.0.0.1:8000",
+    "127.0.0.1:5173",
     "http://127.0.0.1:8000",
     "http://127.0.0.1:5173",
     "localhost",
+    "localhost:8000",
+    "localhost:5173",
     "http://www.iirumi.com",
     "http://iirumi.com",
     "http://52.78.201.149",
@@ -38,6 +42,8 @@ ALLOWED_HOSTS = [
     "http://localhost:8000",
     "http://localhost:5173",
     "iirumi.com",
+    "52.78.204.149",
+    "52.78.204.149:5173",
     "54.180.167.23",
     "http://54.180.167.23",
 ]
@@ -159,9 +165,17 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:5173",
     "http://localhost:5173",
-    "https://iirumi.com",
     "http://iirumi.com",
     "http://52.78.201.149",
     "http://52.78.201.149:5173",
-    "http://54.180.167.23"
+    "http://54.180.167.23",
+
+    "https://127.0.0.1:8000",
+    "https://localhost:8000",
+    "https://127.0.0.1:5173",
+    "https://localhost:5137",
+    "https://iirumi.com",
+    "https://52.78.201.149",
+    "https://52.78.201.149:5173",
+    "https://54.180.167.23"
 ]
