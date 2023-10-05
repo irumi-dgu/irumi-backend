@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import *
 
+#for test
 class ReportAdmin(admin.ModelAdmin):
     list_display = ('id', 'lantern_content', 'reported_categories', 'user_id', 'created_at')
     list_filter = ('created_at', )
