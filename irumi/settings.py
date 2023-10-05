@@ -51,7 +51,6 @@ ALLOWED_HOSTS = [
     "http://54.180.167.23",
 ]
 
-
 # Application definition
 
 INSTALLED_APPS = [
