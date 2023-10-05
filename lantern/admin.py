@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import *
 
-#신고 관련 어드민 내용
 class ReportAdmin(admin.ModelAdmin):
     list_display = ('id', 'lantern_content', 'reported_categories', 'user_id', 'created_at')
     list_filter = ('created_at', )
