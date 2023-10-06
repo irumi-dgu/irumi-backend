@@ -7,7 +7,7 @@ class Lantern(models.Model):
     id = models.AutoField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     nickname = models.CharField(
-        max_length=10,
+        max_length=8,
         null=False,
         blank=False,
         #validators=[RegexValidator(r'^[^\s]{1,10}$', "공백없이 닉네임을 입력해주세요.")],
