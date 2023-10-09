@@ -37,6 +37,11 @@ def censor_content(content):
         content = content.replace(swear, '*' * len(swear))
     return content
 
+def censor_nickname(nickname):
+    for swear in SWEARS:
+        nickname = nickname.replace(swear, '*' * len(swear))
+    return nickname
+
 class LanternViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -92,8 +97,9 @@ class LanternViewSet(
         return context
 
     def create(self, request, *args, **kwargs):
-        # 닉네임에 공백이 포함되어 있는지 검사
+        #닉네임에도 욕설 못들어가게 필터링
         nickname = request.data.get('nickname')
+        censored_nickname = censor_nickname(nickname)
 
         #사용자가 작성한 내용 중 욕설 있는 지 필터링
         content = request.data.get('content')
