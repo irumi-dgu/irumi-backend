@@ -63,15 +63,11 @@ class LanternViewSet(
     @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
     def cookie(self, request):
         user_id = request.COOKIES.get('user_id')
-        #user_fortune = request.COOKIES.get('user_fortune')
-
-        # 쿠키에 fortune이 이미 있다면 그것을 반환
-        if user_fortune:
-            return Response({"fortune": user_fortune})
-
+        
+        # 쿠키에 user_id가 이미 있다면 그것을 사용, 없다면 새로 생성
         if not user_id:
             user_id = str(uuid4())
-            
+
         fortune = Fortune.objects.filter(user_id=user_id).first()
 
         if not fortune:
@@ -82,7 +78,7 @@ class LanternViewSet(
 
         response = Response({"fortune": fortune_content})
         response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # UUID를 쿠키에 저장
-        #response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)  # fortune을 쿠키에 저장
+        response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)  # fortune을 쿠키에 저장
         return response
 
 
@@ -122,12 +118,20 @@ class LanternViewSet(
         data['password'] = hashed_password
 
         headers = self.get_success_headers(serializer.data)
-        
+
         response = Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
         # lantern이 성공적으로 생성되면, fortune을 쿠키에 저장
-        user_fortune = self.get_random_fortune_from_excel()
-        response.set_cookie('user_fortune', user_fortune, max_age=365*24*60*60)
+        user_id = request.COOKIES.get('user_id', str(uuid4()))
+        user_fortune = Fortune.objects.filter(user_id=user_id).first()
+        if not user_fortune:
+            fortune_content = self.get_random_fortune_from_excel()
+            Fortune.objects.create(user_id=user_id, fortune=fortune_content)
+        else:
+            fortune_content = user_fortune.fortune
+
+        response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # UUID를 쿠키에 저장
+        response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)  # fortune을 쿠키에 저장
 
         return response
 
