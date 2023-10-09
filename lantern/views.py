@@ -127,6 +127,9 @@ class LanternViewSet(
         file_path = os.path.join(settings.BASE_DIR, 'static', 'fortune.xlsx')
         df = pd.read_excel(file_path)
         fortune = random.choice(df['fortune'].tolist())
+
+        fortune = fortune.replace('\\r\\n', '\n')
+        
         return fortune
 
     @receiver(post_save, sender=LanternReaction)
