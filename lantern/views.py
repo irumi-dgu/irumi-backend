@@ -63,24 +63,27 @@ class LanternViewSet(
     @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
     def cookie(self, request):
         user_id = request.COOKIES.get('user_id')
-        
-        # 쿠키에 user_id가 이미 있다면 그것을 사용, 없다면 새로 생성
         if not user_id:
-            user_id = str(uuid4())
+            user_id = str(uuid4())  # 새로운 user_id 생성
+            new_cookie = True
+        else:
+            new_cookie = False
 
         fortune = Fortune.objects.filter(user_id=user_id).first()
 
-        if not fortune:
-            fortune_content = self.get_random_fortune_from_excel()
-            Fortune.objects.create(user_id=user_id, fortune=fortune_content)
+        # 이미 해당 사용자에게 할당된 fortune이 있다면 반환
+        if fortune:
+            response = Response({"fortune": fortune.fortune})
         else:
-            fortune_content = fortune.fortune
+            # 아니라면 새 fortune 할당
+            fortune = self.get_random_fortune_from_excel()
+            Fortune.objects.create(user_id=user_id, fortune=fortune)
+            response = Response({"fortune": fortune})
 
-        response = Response({"fortune": fortune_content})
-        response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # UUID를 쿠키에 저장
-        response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)  # fortune을 쿠키에 저장
+        if new_cookie:
+            response.set_cookie('user_id', user_id, max_age=60)  # 유효기간 1년으로 해뒀는디 바꿔도 됨
+
         return response
-
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -94,11 +97,11 @@ class LanternViewSet(
         return context
 
     def create(self, request, *args, **kwargs):
-        # 닉네임에도 욕설 못들어가게 필터링
+        #닉네임에도 욕설 못들어가게 필터링
         nickname = request.data.get('nickname')
         censored_nickname = censor_nickname(nickname)
 
-        # 사용자가 작성한 내용 중 욕설 있는 지 필터링
+        #사용자가 작성한 내용 중 욕설 있는 지 필터링
         content = request.data.get('content')
         censored_content = censor_content(content)
 
@@ -118,22 +121,7 @@ class LanternViewSet(
         data['password'] = hashed_password
 
         headers = self.get_success_headers(serializer.data)
-
-        response = Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-        # lantern이 성공적으로 생성되면, fortune을 쿠키에 저장
-        user_id = request.COOKIES.get('user_id', str(uuid4()))
-        user_fortune = Fortune.objects.filter(user_id=user_id).first()
-        if not user_fortune:
-            fortune_content = self.get_random_fortune_from_excel()
-            Fortune.objects.create(user_id=user_id, fortune=fortune_content)
-        else:
-            fortune_content = user_fortune.fortune
-
-        response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # UUID를 쿠키에 저장
-        response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)  # fortune을 쿠키에 저장
-
-        return response
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_random_fortune_from_excel(self):
         file_path = os.path.join(settings.BASE_DIR, 'static', 'fortune.xlsx')
@@ -182,7 +170,7 @@ class LanternViewSet(
 
         response = Response(response_data)
 
-        response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # 유효기간 1년임
+        response.set_cookie('user_id', user_id, max_age=60)  # 유효기간 1년임
 
         return response
 
@@ -266,5 +254,5 @@ class ReportViewSet(
         headers = self.get_success_headers(serializer.data)
         
         response = Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        response.set_cookie('user_id', user_id, max_age=365*24*60*60)
+        response.set_cookie('user_id', user_id, max_age=60) #쿠키 지속 기간
         return response
