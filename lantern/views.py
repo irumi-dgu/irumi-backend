@@ -64,33 +64,27 @@ class LanternViewSet(
     def cookie(self, request):
         user_id = request.COOKIES.get('user_id')
         user_fortune = request.COOKIES.get('user_fortune')
-        
-        # 쿠키에 fortune이 이미 있다면 반환
+
+        # 쿠키에 fortune이 이미 있다면 그것을 반환
         if user_fortune:
             return Response({"fortune": user_fortune})
 
         if not user_id:
             user_id = str(uuid4())
-            new_cookie = True
-        else:
-            new_cookie = False
-
+        
         fortune = Fortune.objects.filter(user_id=user_id).first()
 
-        if fortune:
-            response = Response({"fortune": fortune.fortune})
-        else:
+        if not fortune:
             fortune_content = self.get_random_fortune_from_excel()
             Fortune.objects.create(user_id=user_id, fortune=fortune_content)
-            response = Response({"fortune": fortune_content})
+        else:
+            fortune_content = fortune.fortune
 
-        if new_cookie:
-            response.set_cookie('user_id', user_id, max_age=365*24*60*60)
-        
-        # lantern 생성 시 사용된 fortune을 쿠키에 저장
-        response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)
-
+        response = Response({"fortune": fortune_content})
+        response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # UUID를 쿠키에 저장
+        response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)  # fortune을 쿠키에 저장
         return response
+
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
