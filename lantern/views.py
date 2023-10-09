@@ -217,7 +217,11 @@ class LanternViewSet(
             'lanterns': serializer.data
         })
 
-class ReportViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin):
+class ReportViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin):
     serializer_class = ReportSerializer
     
     def get_queryset(self, *args, **kwargs):
