@@ -63,25 +63,32 @@ class LanternViewSet(
     @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
     def cookie(self, request):
         user_id = request.COOKIES.get('user_id')
+        user_fortune = request.COOKIES.get('user_fortune')
+        
+        # 쿠키에 fortune이 이미 있다면 반환
+        if user_fortune:
+            return Response({"fortune": user_fortune})
+
         if not user_id:
-            user_id = str(uuid4())  # 새로운 user_id 생성
+            user_id = str(uuid4())
             new_cookie = True
         else:
             new_cookie = False
 
         fortune = Fortune.objects.filter(user_id=user_id).first()
 
-        # 이미 해당 사용자에게 할당된 fortune이 있다면 반환
         if fortune:
             response = Response({"fortune": fortune.fortune})
         else:
-            # 아니라면 새 fortune 할당
-            fortune = self.get_random_fortune_from_excel()
-            Fortune.objects.create(user_id=user_id, fortune=fortune)
-            response = Response({"fortune": fortune})
+            fortune_content = self.get_random_fortune_from_excel()
+            Fortune.objects.create(user_id=user_id, fortune=fortune_content)
+            response = Response({"fortune": fortune_content})
 
         if new_cookie:
-            response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # 유효기간 1년으로 해뒀는디 바꿔도 됨
+            response.set_cookie('user_id', user_id, max_age=365*24*60*60)
+        
+        # lantern 생성 시 사용된 fortune을 쿠키에 저장
+        response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)
 
         return response
 
@@ -97,11 +104,11 @@ class LanternViewSet(
         return context
 
     def create(self, request, *args, **kwargs):
-        #닉네임에도 욕설 못들어가게 필터링
+        # 닉네임에도 욕설 못들어가게 필터링
         nickname = request.data.get('nickname')
         censored_nickname = censor_nickname(nickname)
 
-        #사용자가 작성한 내용 중 욕설 있는 지 필터링
+        # 사용자가 작성한 내용 중 욕설 있는 지 필터링
         content = request.data.get('content')
         censored_content = censor_content(content)
 
@@ -121,7 +128,14 @@ class LanternViewSet(
         data['password'] = hashed_password
 
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        
+        response = Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+        # lantern이 성공적으로 생성되면, fortune을 쿠키에 저장
+        user_fortune = self.get_random_fortune_from_excel()
+        response.set_cookie('user_fortune', user_fortune, max_age=365*24*60*60)
+
+        return response
 
     def get_random_fortune_from_excel(self):
         file_path = os.path.join(settings.BASE_DIR, 'static', 'fortune.xlsx')
