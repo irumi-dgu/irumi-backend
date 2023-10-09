@@ -112,6 +112,7 @@ class LanternViewSet(
         # request.data의 복사본을 생성
         data = request.data.copy()
         data['content'] = censored_content
+        data['nickname'] = censored_nickname
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
