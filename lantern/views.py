@@ -71,7 +71,7 @@ class LanternViewSet(
 
         if not user_id:
             user_id = str(uuid4())
-        
+            
         fortune = Fortune.objects.filter(user_id=user_id).first()
 
         if not fortune:
