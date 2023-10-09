@@ -63,7 +63,7 @@ class LanternViewSet(
     @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
     def cookie(self, request):
         user_id = request.COOKIES.get('user_id')
-        user_fortune = request.COOKIES.get('user_fortune')
+        #user_fortune = request.COOKIES.get('user_fortune')
 
         # 쿠키에 fortune이 이미 있다면 그것을 반환
         if user_fortune:
@@ -82,7 +82,7 @@ class LanternViewSet(
 
         response = Response({"fortune": fortune_content})
         response.set_cookie('user_id', user_id, max_age=365*24*60*60)  # UUID를 쿠키에 저장
-        response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)  # fortune을 쿠키에 저장
+        #response.set_cookie('user_fortune', fortune_content, max_age=365*24*60*60)  # fortune을 쿠키에 저장
         return response
 
 
