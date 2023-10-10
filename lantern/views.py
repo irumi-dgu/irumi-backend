@@ -60,6 +60,8 @@ class LanternViewSet(
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = LanternFilter
 
+    throttle_scope = 'likes'
+
     @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
     def cookie(self, request):
         user_id = request.COOKIES.get('user_id')
@@ -149,7 +151,7 @@ class LanternViewSet(
                 instance.lantern.save()
 
     #좋아요 누를 시 쿠키 기반으로 막기
-    @action(methods=["POST"], detail=True, permission_classes=[AllowAny])
+    @action(methods=["POST"], detail=True, permission_classes=[AllowAny], throttle_scope='likes')
     def likes(self, request, pk=None):
         lantern = self.get_object()
 

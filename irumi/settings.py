@@ -105,7 +105,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "irumi.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -172,3 +171,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://52.78.201.149:5173",
     "http://54.180.167.23",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '500/minute',
+        'user' : '1000/hour',
+        'likes': '50/minute',
+    }
+}
