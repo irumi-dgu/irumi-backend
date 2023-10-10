@@ -182,5 +182,8 @@ REST_FRAMEWORK = {
         'anon': '500/minute',
         'user' : '1000/hour',
         'likes': '50/minute',
-    }
+    },
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
 }
