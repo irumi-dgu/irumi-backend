@@ -27,7 +27,8 @@ SECRET_KEY = config('SECRET_KEY')
 
 #SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-DEBUG = True
+# DEBUG = True
+DEBUG = config('DEBUG_VALUE', default=True, cast=bool)
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -108,12 +109,25 @@ WSGI_APPLICATION = "irumi.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# 기본 설정 : (개발환경)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+# 배포환경에서의 설정
+if config('DJANGO_DEPLOY', default=False, cast=bool):
+    DATABASES = {
+        'default': {
+            'ENGINE': config('DATABASE_ENGINE'),
+            'NAME': config('DATABASE_NAME'),
+            'USER': config('DATABASE_USER'),
+            'PASSWORD': config('DATABASE_USER_PASSWORD'),
+            'HOST': config('DATABASE_HOST'),
+            'PORT': config('DATABASE_PORT')
+        }
+    }
 
 
 # Password validation
@@ -178,12 +192,13 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
         'rest_framework.throttling.ScopedRateThrottle',
     ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '500/minute',
-        'user' : '1000/hour',
-        'likes': '50/minute',
-    },
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
+    # 보안 관련 : 개발 완료 시 주석 해제
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'anon': '500/minute',
+    #     'user' : '1000/hour',
+    #     'likes': '50/minute',
+    # },
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     'rest_framework.renderers.JSONRenderer',
+    # ),
 }
