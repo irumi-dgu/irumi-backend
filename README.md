@@ -1,5 +1,10 @@
 # irumi-backend
 
+## 개발 버전 정보
+> - python 가상환경 : 3.11
+> - django : 5.0.4
+> - 나머지 패키지 : python, django 버전에 맞게 설치
+
 ## 초기 셋팅
 ### 가상환경 생성
     windows : python -m venv {가상 환경 이름}
