@@ -30,28 +30,6 @@ SECRET_KEY = config('SECRET_KEY')
 # DEBUG = True
 DEBUG = config('DEBUG_VALUE', default=True, cast=bool)
 
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "127.0.0.1:8000",
-    "127.0.0.1:5173",
-    "http://127.0.0.1:8000",
-    "http://127.0.0.1:5173",
-    "localhost",
-    "localhost:8000",
-    "localhost:5173",
-    "http://www.iirumi.com",
-    "http://iirumi.com",
-    "http://52.78.201.149",
-    "http://52.78.201.149:5173",
-    "http://localhost:8000",
-    "http://localhost:5173",
-    "iirumi.com",
-    "52.78.201.149",
-    "52.78.201.149:5173",
-    "54.180.167.23",
-    "http://54.180.167.23",
-]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -148,6 +126,28 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# CORS 설정
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
+
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5173',
+    
+    'http://localhost',
+    'http://localhost:3000',
+    'http://localhost:5173',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://irumi-server.site",
+    "https://irumi-server.site",
+    "http://www.irumi-server.site",
+    "https://www.irumi-server.site",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -162,29 +162,19 @@ USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_ALLOW_CREDENTIALS = True
-
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-    "http://127.0.0.1:5173",
-    "http://localhost:5173",
-    "http://iirumi.com",
-    "http://52.78.201.149",
-    "http://52.78.201.149:5173",
-    "http://54.180.167.23",
-]
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': [
