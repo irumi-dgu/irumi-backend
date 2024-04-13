@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     #app
     "lantern",
+    "lamplight",
 
     "rest_framework",
     "multiselectfield",
