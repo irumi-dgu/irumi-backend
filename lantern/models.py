@@ -25,7 +25,7 @@ class Lantern(models.Model):
     COLOR_CHOICES = [
         ('pink', 'pink'), # pink
         ('green', 'green'), # green
-        ('pruple', 'purple'), # purple
+        ('purple', 'purple'), # purple
         ('blue', 'blue'), # blue
         ('yellow', 'yellow'), # yellow
     ]
