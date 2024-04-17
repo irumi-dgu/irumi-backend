@@ -192,7 +192,7 @@ REST_FRAMEWORK = {
         'user' : '1000/hour',
         'likes': '50/minute',
     },
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
+    #'DEFAULT_RENDERER_CLASSES': (
+    #    'rest_framework.renderers.JSONRenderer',
+    #),
 }
