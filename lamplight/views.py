@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from rest_framework import viewsets, mixins
 
 from .serializers import *
