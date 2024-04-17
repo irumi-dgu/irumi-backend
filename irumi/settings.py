@@ -142,10 +142,6 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:5173',
 
-    'http://localhost/',
-    'http://localhost:3000/',
-    'http://localhost:5173/',
-
     'http://irumi-server.site',
     'https://irumi-server.site',
 ]
