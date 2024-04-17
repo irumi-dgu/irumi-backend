@@ -23,13 +23,16 @@ class Lantern(models.Model):
     is_liked = models.BooleanField(default=False)
     is_reported = models.BooleanField(default=False)
     COLOR_CHOICES = [
-        (1, '1'), # red
-        (2, '2'), # yellow
-        (3, '3'), # green
-        (4, '4'), # blue
-        (5, '5'), # purple
+        ('pink', 'pink'), # pink
+        ('green', 'green'), # green
+        ('pruple', 'purple'), # purple
+        ('blue', 'blue'), # blue
+        ('yellow', 'yellow'), # yellow
     ]
-    lanternColor = models.IntegerField(choices=COLOR_CHOICES, default=1)
+    lanternColor = models.CharField(
+        max_length=10,
+        choices=COLOR_CHOICES, 
+        default='pink')
 
 class LanternReaction(models.Model):
     REACTION_CHOICES = (("like", "Like"), ("dislike", "Dislike"))
