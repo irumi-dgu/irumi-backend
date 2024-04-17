@@ -141,6 +141,9 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost',
     'http://localhost:3000',
     'http://localhost:5173',
+
+    'http://irumi-server.site',
+    'https://irumi-server.site',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
