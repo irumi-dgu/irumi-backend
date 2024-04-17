@@ -187,12 +187,12 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.ScopedRateThrottle',
     ],
     # 보안 관련 : 개발 완료 시 주석 해제
-    # 'DEFAULT_THROTTLE_RATES': {
-    #     'anon': '500/minute',
-    #     'user' : '1000/hour',
-    #     'likes': '50/minute',
-    # },
-    # 'DEFAULT_RENDERER_CLASSES': (
-    #     'rest_framework.renderers.JSONRenderer',
-    # ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '500/minute',
+        'user' : '1000/hour',
+        'likes': '50/minute',
+    },
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
 }
