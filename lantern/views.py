@@ -172,8 +172,8 @@ class LanternViewSet(
 
         like_count = Lantern.objects.filter(id=lantern.id).annotate(
             like_cnt=Count(
-                'reactions', filter=Q(reactions__reaction="like"), distinct=True
-                )).get().like_cnt
+                'reactions', filter=Q(reactions__reaction="like"), distinct=True)
+                ).get().like_cnt
 
         response_data['like_cnt'] = like_count 
 
