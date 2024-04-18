@@ -144,6 +144,8 @@ CORS_ALLOWED_ORIGINS = [
 
     'http://irumi-server.site',
     'https://irumi-server.site',
+
+    'https://main--boisterous-elf-097175.netlify.app',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
