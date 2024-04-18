@@ -98,37 +98,38 @@ class LanternViewSet(
         context['user_id'] = self.request.COOKIES.get('user_id', None)
         return context
 
-def create(self, request, *args, **kwargs):
-    # 닉네임에 욕설이 포함되어 있지 않은지 필터링
-    nickname = request.data.get('nickname')
-    censored_nickname = censor_nickname(nickname)
+    def create(self, request, *args, **kwargs):
+        # 닉네임에 욕설이 포함되어 있지 않은지 필터링
+        nickname = request.data.get('nickname')
+        censored_nickname = censor_nickname(nickname)
 
-    # 사용자가 작성한 내용 중 욕설이 있는지 필터링
-    content = request.data.get('content')
-    censored_content = censor_content(content)
+        # 사용자가 작성한 내용 중 욕설이 있는지 필터링
+        content = request.data.get('content')
+        censored_content = censor_content(content)
 
-    # 비밀번호를 그대로 저장 (후에 해시하여 저장)
-    password = request.data.get('password')
+        # 비밀번호를 그대로 저장 (후에 해시하여 저장)
+        password = request.data.get('password')
 
-    # request.data의 복사본
-    data = request.data.copy()
-    data['content'] = censored_content
-    data['nickname'] = censored_nickname
+        # request.data의 복사본을 생성하고 수정
+        data = request.data.copy()
+        data['content'] = censored_content
+        data['nickname'] = censored_nickname
 
-    # Serializer로 데이터 검증 및 저장
-    serializer = self.get_serializer(data=data)
-    serializer.is_valid(raise_exception=True)
-    instance = serializer.save()
+        # Serializer로 데이터 검증 및 저장
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()  # 여기서는 비밀번호를 해시하지 않고 저장함
 
-    # 저장되는 건 해시된 비밀번호
-    instance.password = make_password(password)
-    instance.save()
+        # 이제 비밀번호를 해시하여 데이터베이스에 업데이트
+        instance.password = make_password(password)
+        instance.save()
 
-    response_data = serializer.data
-    response_data['password'] = password
+        # 응답 데이터 생성
+        response_data = serializer.data
+        response_data['password'] = password  # 원본 비밀번호를 응답 데이터에 포함
 
-    headers = self.get_success_headers(response_data)
-    return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
+        headers = self.get_success_headers(response_data)
+        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_random_fortune_from_excel(self):
         file_path = os.path.join(settings.BASE_DIR, 'static', 'fortune.xlsx')
