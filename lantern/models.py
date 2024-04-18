@@ -1,7 +1,30 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.utils.crypto import get_random_string
-from multiselectfield import MultiSelectField
+# django-multiselectfield 오버라이딩
+from multiselectfield import MultiSelectField as MSField
+
+class MultiSelectField(MSField):
+    """
+    Custom Implementation of MultiSelectField to achieve Django 5.0 compatibility
+
+    See: https://github.com/goinnn/django-multiselectfield/issues/141#issuecomment-1911731471
+    """
+
+    def _get_flatchoices(self):
+        flat_choices = super(models.CharField, self).flatchoices
+
+        class MSFFlatchoices(list):
+            # Used to trick django.contrib.admin.utils.display_for_field into not treating the list of values as a
+            # dictionary key (which errors out)
+            def __bool__(self):
+                return False
+
+            __nonzero__ = __bool__
+
+        return MSFFlatchoices(flat_choices)
+
+    flatchoices = property(_get_flatchoices)
 
 class Lantern(models.Model):
     id = models.AutoField(primary_key=True)
@@ -44,6 +67,7 @@ class Fortune(models.Model):
     user_id = models.CharField(max_length=36, unique=True)
     fortune = models.TextField()
     
+
 class Report(models.Model):
     lantern = models.ForeignKey(Lantern, on_delete=models.CASCADE)
     CATEGORY_CHOICES = (
