@@ -115,12 +115,11 @@ class LanternViewSet(
         data = request.data.copy()
         data['content'] = censored_content
         data['nickname'] = censored_nickname
+        data['password'] = hashed_password
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-
-        data['password'] = hashed_password
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

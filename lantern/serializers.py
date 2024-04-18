@@ -20,7 +20,8 @@ class LanternListSerializer(serializers.ModelSerializer):
         return False
 
     def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data['password'])
+        # 임시 주석 처리
+        # validated_data['password'] = make_password(validated_data['password'])
         lantern = Lantern.objects.create(**validated_data)
         return lantern
     
