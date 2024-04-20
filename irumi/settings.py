@@ -146,6 +146,8 @@ CORS_ALLOWED_ORIGINS = [
     'https://irumi-server.site',
 
     'https://main--boisterous-elf-097175.netlify.app',
+    "https://irumii.netlify.app",
+
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -194,7 +196,7 @@ REST_FRAMEWORK = {
         'user' : '1000/hour',
         'likes': '50/minute',
     },
-    #'DEFAULT_RENDERER_CLASSES': (
-    #    'rest_framework.renderers.JSONRenderer',
-    #),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
 }
