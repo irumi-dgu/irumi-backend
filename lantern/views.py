@@ -84,7 +84,7 @@ class LanternViewSet(
 
         if new_cookie:
             response.set_cookie(
-                'user_id', user_id, max_age=31536000, samesite='None', secure=True, path='/')
+                'user_id', user_id, max_age=31536000)
 
         return response
 
