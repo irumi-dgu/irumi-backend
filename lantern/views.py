@@ -83,7 +83,7 @@ class LanternViewSet(
             response = Response({"fortune": fortune})
 
         if new_cookie:
-            response.set_cookie('user_id', user_id, max_age=60)  # 유효기간 1년으로 해뒀는디 바꿔도 됨
+            response.set_cookie('user_id', user_id, max_age=31536000, samesite='None', secure=True)
 
         return response
 
