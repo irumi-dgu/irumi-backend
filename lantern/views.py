@@ -35,6 +35,8 @@ SWEARS = load_swears('fword_list.txt')
 def censor_content(content):
     for swear in SWEARS:
         content = content.replace(swear, '*' * len(swear))
+
+        content = content.replace('\\r\\n', '\n')
     return content
 
 def censor_nickname(nickname):
