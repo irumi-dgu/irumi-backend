@@ -157,8 +157,6 @@ class LanternViewSet(
 
         # 쿠키에서 user_id 가져오기. 없으면 새로 생성!
         user_id = request.COOKIES.get('user_id')
-        if not user_id:
-            user_id = str(uuid4())
 
         # 이미 좋아요 눌렀는지 확인
         existing_like = LanternReaction.objects.filter(lantern=lantern, user_id=user_id, reaction="like").first()
@@ -180,9 +178,6 @@ class LanternViewSet(
         response_data['like_cnt'] = like_count 
 
         response = Response(response_data)
-
-        # 유효기간 1년 설정
-        response.set_cookie('user_id', user_id, max_age=31536000)  # max_age=31536000은 1년(초 단위)
 
         return response
 

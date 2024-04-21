@@ -61,7 +61,7 @@ class LanternReaction(models.Model):
     REACTION_CHOICES = (("like", "Like"), ("dislike", "Dislike"))
     reaction = models.CharField(choices=REACTION_CHOICES, max_length=10)
     lantern = models.ForeignKey(Lantern, on_delete=models.CASCADE, related_name='reactions')
-    user_id = models.CharField(max_length=36)
+    user_id = models.CharField(max_length=36, null=True)
 
 class Fortune(models.Model):
     user_id = models.CharField(max_length=36, unique=True)
