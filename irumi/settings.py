@@ -138,6 +138,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://127.0.0.1:5173',
     'http://127.0.0.1:5174',
+    'http://192.168.45.69:5173',
     
     'http://localhost',
     'http://localhost:3000',
@@ -148,7 +149,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://irumi-server.site',
 
     'https://main--boisterous-elf-097175.netlify.app',
-    "https://iirumiii.netlify.app",
+    'https://iirumiii.netlify.app',
 
 ]
 
