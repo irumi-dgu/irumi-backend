@@ -66,12 +66,12 @@ class LanternViewSet(
 
     @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
     def cookie(self, request):
-        user_id = request.COOKIES.get('user_id')
-        if not user_id:
-            user_id = str(uuid4())  # 새로운 user_id 생성
-            new_cookie = True
-        else:
-            new_cookie = False
+        user_id = request.headers.get('user_id')
+        # if not user_id:
+        #     user_id = str(uuid4())  # 새로운 user_id 생성
+        #     new_cookie = True
+        # else:
+        #     new_cookie = False
 
         fortune = Fortune.objects.filter(user_id=user_id).first()
 
@@ -84,9 +84,9 @@ class LanternViewSet(
             Fortune.objects.create(user_id=user_id, fortune=fortune)
             response = Response({"fortune": fortune})
 
-        if new_cookie:
-            response.set_cookie(
-                'user_id', user_id, max_age=365, samesite='None', secure=True)
+        # if new_cookie:
+        #     response.set_cookie(
+        #         'user_id', user_id, max_age=365, samesite='None', secure=True)
 
         return response
 
@@ -98,8 +98,7 @@ class LanternViewSet(
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['user_id'] = self.request.COOKIES.get('user_id', None)
-        print(context)
+        context['user_id'] = self.request.headers.get('userid')
         return context
 
     def create(self, request, *args, **kwargs):
@@ -159,7 +158,7 @@ class LanternViewSet(
         lantern = self.get_object()
 
         # 쿠키에서 user_id 가져오기. 없으면 새로 생성!
-        user_id = request.COOKIES.get('user_id')
+        user_id = request.headers.get('userid')
 
         # 이미 좋아요 눌렀는지 확인
         existing_like = LanternReaction.objects.filter(lantern=lantern, user_id=user_id, reaction="like").first()
@@ -244,7 +243,7 @@ class ReportViewSet(
         return queryset
     
     def create(self, request, *args, **kwargs):
-        user_id = request.COOKIES.get('user_id')
+        user_id = request.headers.get('userid')
         if not user_id:
             user_id = str(uuid4())
         
@@ -264,5 +263,5 @@ class ReportViewSet(
         headers = self.get_success_headers(serializer.data)
         
         response = Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        response.set_cookie('user_id', user_id, max_age=60) #쿠키 지속 기간
+        # response.set_cookie('userid', user_id, max_age=60) #쿠키 지속 기간
         return response
