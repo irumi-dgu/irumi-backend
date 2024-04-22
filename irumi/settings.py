@@ -188,18 +188,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-        'rest_framework.throttling.ScopedRateThrottle',
-    ],
-    # 보안 관련 : 개발 완료 시 주석 해제
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '500/minute',
-        'user' : '1000/hour',
-        'likes': '50/minute',
-    },
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.AnonRateThrottle',
+    #     'rest_framework.throttling.UserRateThrottle',
+    #     'rest_framework.throttling.ScopedRateThrottle',
+    # ],
+    # # 보안 관련 : 개발 완료 시 주석 해제
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'anon': '500/minute',
+    #     'user' : '1000/hour',
+    #     'likes': '50/minute',
+    # },
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     'rest_framework.renderers.JSONRenderer',
+    # ),
 }

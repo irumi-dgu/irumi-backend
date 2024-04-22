@@ -99,6 +99,7 @@ class LanternViewSet(
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['user_id'] = self.request.COOKIES.get('user_id', None)
+        print(context)
         return context
 
     def create(self, request, *args, **kwargs):
