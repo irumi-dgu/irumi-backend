@@ -64,7 +64,7 @@ class LanternReaction(models.Model):
     user_id = models.CharField(max_length=36, null=True)
 
 class Fortune(models.Model):
-    user_id = models.CharField(max_length=36, unique=True)
+    user_id = models.CharField(max_length=36, null=True)
     fortune = models.TextField()
     
 
