@@ -148,6 +148,9 @@ CORS_ALLOWED_ORIGINS = [
 
     'http://irumi-server.site',
     'https://irumi-server.site',
+    
+    'https://iirumi.com',
+    'https://www.iirumi.com',
 
     'https://main--boisterous-elf-097175.netlify.app',
     'https://iirumiii.netlify.app',
