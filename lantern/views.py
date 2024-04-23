@@ -66,27 +66,8 @@ class LanternViewSet(
 
     @action(detail=False, methods=["GET"], permission_classes=[AllowAny])
     def cookie(self, request):
-        user_id = request.headers.get('user_id')
-        # if not user_id:
-        #     user_id = str(uuid4())  # 새로운 user_id 생성
-        #     new_cookie = True
-        # else:
-        #     new_cookie = False
-
-        fortune = Fortune.objects.filter(user_id=user_id).first()
-
-        # 이미 해당 사용자에게 할당된 fortune이 있다면 반환
-        if fortune:
-            response = Response({"fortune": fortune.fortune})
-        else:
-            # 아니라면 새 fortune 할당
-            fortune = self.get_random_fortune_from_excel()
-            Fortune.objects.create(user_id=user_id, fortune=fortune)
-            response = Response({"fortune": fortune})
-
-        # if new_cookie:
-        #     response.set_cookie(
-        #         'user_id', user_id, max_age=365, samesite='None', secure=True)
+        fortune = self.get_random_fortune_from_excel()
+        response = Response({"fortune": fortune})
 
         return response
 
