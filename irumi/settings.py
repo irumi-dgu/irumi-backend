@@ -199,8 +199,8 @@ REST_FRAMEWORK = {
     ],
     # 보안 관련 : 개발 완료 시 주석 해제
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '500/minute',
-        'user' : '1000/hour',
+        'anon': '100/minute',
+        'user' : '500/hour',
         'likes': '50/minute',
     },
     'DEFAULT_RENDERER_CLASSES': (
